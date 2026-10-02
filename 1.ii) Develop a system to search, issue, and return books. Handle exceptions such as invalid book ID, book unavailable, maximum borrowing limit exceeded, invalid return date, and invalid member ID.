@@ -1,0 +1,155 @@
+import java.util.Scanner;
+
+class InvalidBookIdException extends Exception {
+    public InvalidBookIdException(String message) {
+        super(message);
+    }
+}
+
+class BookUnavailableException extends Exception {
+    public BookUnavailableException(String message) {
+        super(message);
+    }
+}
+
+class MaxBorrowLimitExceededException extends Exception {
+    public MaxBorrowLimitExceededException(String message) {
+        super(message);
+    }
+}
+
+class InvalidMemberIdException extends Exception {
+    public InvalidMemberIdException(String message) {
+        super(message);
+    }
+}
+
+class InvalidReturnDateException extends Exception {
+    public InvalidReturnDateException(String message) {
+        super(message);
+    }
+}
+
+public class LibrarySystem {
+
+    static String[] bookIds = {"101", "102", "103"};
+    static String[] bookTitles = {"Java", "Python", "C++"};
+    static boolean[] bookAvailable = {true, true, true};
+
+    static String[] memberIds = {"M1", "M2"};
+    static int[] memberBorrowedCounts = {0, 0};
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            System.out.print("Enter book title or ID to search: ");
+            String keyword = scanner.nextLine();
+            searchBooks(keyword);
+
+            System.out.print("\nEnter Member ID to issue book: ");
+            String mId = scanner.nextLine();
+            System.out.print("Enter Book ID to issue book: ");
+            String bId = scanner.nextLine();
+            issueBook(mId, bId);
+
+            System.out.print("\nEnter Member ID to return book: ");
+            String retMemberId = scanner.nextLine();
+            System.out.print("Enter Book ID to return book: ");
+            String retBookId = scanner.nextLine();
+            System.out.print("Enter Return Day (1-31): ");
+            int retDay = scanner.nextInt();
+            System.out.print("Enter Issue Day (1-31): ");
+            int issDay = scanner.nextInt();
+            returnBook(retMemberId, retBookId, retDay, issDay);
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            scanner.close();
+        }
+    }
+
+    public static void searchBooks(String keyword) {
+        boolean found = false;
+        for (int i = 0; i < bookIds.length; i++) {
+            if (bookTitles[i].equalsIgnoreCase(keyword) || bookIds[i].equals(keyword)) {
+                System.out.println("Found -> ID: " + bookIds[i] + " | Title: " + bookTitles[i] + " | Available: " + bookAvailable[i]);
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("No books found matching that keyword.");
+        }
+    }
+
+    public static void issueBook(String memberId, String bookId) throws InvalidMemberIdException, InvalidBookIdException, BookUnavailableException, MaxBorrowLimitExceededException {
+        int memberIndex = -1;
+        for (int i = 0; i < memberIds.length; i++) {
+            if (memberIds[i].equals(memberId)) {
+                memberIndex = i;
+                break;
+            }
+        }
+        if (memberIndex == -1) {
+            throw new InvalidMemberIdException("Member ID does not exist.");
+        }
+
+        int bookIndex = -1;
+        for (int i = 0; i < bookIds.length; i++) {
+            if (bookIds[i].equals(bookId)) {
+                bookIndex = i;
+                break;
+            }
+        }
+        if (bookIndex == -1) {
+            throw new InvalidBookIdException("Book ID does not exist.");
+        }
+
+        if (!bookAvailable[bookIndex]) {
+            throw new BookUnavailableException("Book is already issued.");
+        }
+
+        if (memberBorrowedCounts[memberIndex] >= 3) {
+            throw new MaxBorrowLimitExceededException("Borrowing limit of 3 books reached.");
+        }
+
+        bookAvailable[bookIndex] = false;
+        memberBorrowedCounts[memberIndex]++;
+        System.out.println("Success: Book issued.");
+    }
+
+    public static void returnBook(String memberId, String bookId, int returnDay, int issueDay) throws InvalidMemberIdException, InvalidBookIdException, InvalidReturnDateException {
+        int memberIndex = -1;
+        for (int i = 0; i < memberIds.length; i++) {
+            if (memberIds[i].equals(memberId)) {
+                memberIndex = i;
+                break;
+            }
+        }
+        if (memberIndex == -1) {
+            throw new InvalidMemberIdException("Member ID does not exist.");
+        }
+
+        int bookIndex = -1;
+        for (int i = 0; i < bookIds.length; i++) {
+            if (bookIds[i].equals(bookId)) {
+                bookIndex = i;
+                break;
+            }
+        }
+        if (bookIndex == -1) {
+            throw new InvalidBookIdException("Book ID does not exist.");
+        }
+
+        if (returnDay < issueDay) {
+            throw new InvalidReturnDateException("Return day cannot be smaller than issue day.");
+        }
+
+        bookAvailable[bookIndex] = true;
+        if (memberBorrowedCounts[memberIndex] > 0) {
+            memberBorrowedCounts[memberIndex]--;
+        }
+        System.out.println("Success: Book returned.");
+    }
+}
