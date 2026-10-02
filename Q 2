@@ -1,0 +1,67 @@
+import java.util.Scanner;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
+import java.util.Queue;
+import java.util.List;
+
+public class SimpleCollectionsLibrary {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        Map<String, String> bookMap = new HashMap<>();
+        bookMap.put("101", "Java Programming");
+        bookMap.put("102", "Python Basics");
+
+        Set<String> categories = new HashSet<>();
+        categories.add("Coding");
+        categories.add("Tech");
+        categories.add("Coding"); 
+
+        Queue<String> waitlist = new LinkedList<>();
+
+        List<String> borrowedBooks = new ArrayList<>();
+
+        System.out.println("Available Genres in Library: " + categories);
+        
+        System.out.print("\nEnter Book ID to search: ");
+        String searchId = scanner.nextLine();
+        if (bookMap.containsKey(searchId)) {
+            System.out.println("Book Found! Title: " + bookMap.get(searchId));
+        } else {
+            System.out.println("Book ID not found.");
+        }
+
+        System.out.print("\nEnter your name to borrow 'Java Programming': ");
+        String userName = scanner.nextLine();
+        
+        if (borrowedBooks.isEmpty()) {
+            borrowedBooks.add("Java Programming");
+            System.out.println("Success! 'Java Programming' is added to your personal borrowed List.");
+        } else {
+            waitlist.add(userName);
+            System.out.println("Book already taken! Added " + userName + " to the waiting Queue.");
+        }
+
+        System.out.print("\nEnter another name to borrow the same book: ");
+        String user2 = scanner.nextLine();
+        waitlist.add(user2);
+        System.out.println("Book busy. Current Queue line: " + waitlist);
+
+        System.out.println("\n--- Processing Book Return ---");
+        borrowedBooks.remove("Java Programming");
+        System.out.println("Book returned. Your personal borrowed List is now empty.");
+
+        if (!waitlist.isEmpty()) {
+            String nextPerson = waitlist.poll(); 
+            borrowedBooks.add("Java Programming");
+            System.out.println("Success! Book automatically transferred to next person in Queue: " + nextPerson);
+        }
+
+        scanner.close();
+    }
+}
+
